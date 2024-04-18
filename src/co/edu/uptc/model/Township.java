@@ -12,4 +12,10 @@ public class Township {
         this.name = name;
         this.inhabitants = new AVLTree<>(Comparator.comparing(Inhabitant::getName));
     }
+
+    public void addInhabitant(Inhabitant inhabitant) {
+        this.inhabitants.insert(inhabitant);
+    }
+
+
 }

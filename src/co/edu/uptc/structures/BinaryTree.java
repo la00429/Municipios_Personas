@@ -52,10 +52,17 @@ public class BinaryTree<T> {
     public T findData(NodeDouble<T> current, T value) {
         NodeDouble<T> nodeFound = new NodeDouble<T>(null);
         T dataFound = nodeFound.getData();
-        if (current == null) {
-            dataFound = null;
+        if (current != null) {
+            if (comparator.compare(value, current.getData()) == 0) {
+                dataFound = current.getData();
+            } else {
+                if (comparator.compare(value, current.getData()) > 0) {
+                    dataFound = findData(current.getRight(), value);
+                } else {
+                    dataFound = findData(current.getLeft(), value);
+                }
+            }
         }
-
         if (comparator.compare(value, current.getData()) == 0) {
             dataFound = current.getData();
         } else {
