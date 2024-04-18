@@ -17,32 +17,56 @@ public class BinaryTree<T> {
         return this.root == null;
     }
 
-    public void insert(T value) {
-        insert(this.root, value);
+    public boolean insert(T value) {
+        return insert(this.root, value);
     }
 
-    public void insert(NodeDouble<T> nodeCurrent, T value) {
-        NodeDouble<T> node = new NodeDouble<T>(value);
+    public boolean insert(NodeDouble<T> node, T value) {
+        NodeDouble<T> nodeNew = new NodeDouble<T>(value);
+        boolean inserted = false;
         if (isEmpty()) {
-            root = node;
+            this.root = nodeNew;
+            inserted = true;
         } else {
-            NodeDouble<T> aux = nodeCurrent;
-            NodeDouble<T> father = null;
-            while (aux != null) {
+            inserted = insert(node, value, nodeNew);
+        }
+        return inserted;
+    }
 
-                father = aux;
-                if (comparator.compare(value, aux.getData()) > 0) {
-                    aux = aux.getRight();
-                } else {
-                    aux = aux.getLeft();
+    private boolean insert(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
+        boolean inserted = false;
+        if(comparator.compare(value, node.getData()) != 0){
+            if (comparator.compare(value, node.getData()) > 0) {
+                inserted = insertRight(node, value, nodeNew);
+            } else {
+                if (comparator.compare(value, node.getData()) < 0) {
+                    inserted = insertLeft(node, value, nodeNew);
                 }
             }
-            if (comparator.compare(value, father.getData()) > 0) {
-                father.setRight(node);
-            } else {
-                father.setLeft(node);
-            }
         }
+        return inserted;
+    }
+
+    private boolean insertRight(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
+        boolean inserted = false;
+        if (node.getRight() == null) {
+            node.setRight(nodeNew);
+            inserted = true;
+        } else {
+            insert(node.getRight(), value);
+        }
+        return inserted;
+    }
+
+    private boolean insertLeft(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
+        boolean inserted = false;
+        if (node.getLeft() == null) {
+            node.setLeft(nodeNew);
+            inserted = true;
+        } else {
+            insert(node.getLeft(), value);
+        }
+        return inserted;
     }
 
     public T searchData(T value) {
@@ -61,15 +85,6 @@ public class BinaryTree<T> {
                 } else {
                     dataFound = findData(current.getLeft(), value);
                 }
-            }
-        }
-        if (comparator.compare(value, current.getData()) == 0) {
-            dataFound = current.getData();
-        } else {
-            if (comparator.compare(value, current.getData()) > 0) {
-                dataFound = findData(current.getRight(), value);
-            } else {
-                dataFound = findData(current.getLeft(), value);
             }
         }
         return dataFound;

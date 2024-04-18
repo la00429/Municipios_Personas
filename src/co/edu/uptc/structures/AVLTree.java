@@ -25,6 +25,7 @@ public class AVLTree<T> {
         boolean inserted = false;
         if (isEmpty()) {
             this.root = nodeNew;
+            inserted = true;
         } else {
             inserted = insert(node, value, nodeNew);
         }
@@ -33,11 +34,13 @@ public class AVLTree<T> {
 
     private boolean insert(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
         boolean inserted = false;
-        if (comparator.compare(value, node.getData()) > 0) {
-            inserted = insertRight(node, value, nodeNew);
-        } else {
-            if (comparator.compare(value, node.getData()) < 0) {
-                inserted = insertLeft(node, value, nodeNew);
+        if(comparator.compare(value, node.getData()) != 0){
+            if (comparator.compare(value, node.getData()) > 0) {
+                inserted = insertRight(node, value, nodeNew);
+            } else {
+                if (comparator.compare(value, node.getData()) < 0) {
+                    inserted = insertLeft(node, value, nodeNew);
+                }
             }
         }
         return inserted;
@@ -46,7 +49,7 @@ public class AVLTree<T> {
     private boolean insertRight(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
         boolean inserted = false;
         if (node.getRight() == null) {
-            insertRight(node, nodeNew);
+            inserted = insertRight(node, nodeNew);
             inserted = true;
         } else {
             insert(node.getRight(), value);
@@ -54,11 +57,12 @@ public class AVLTree<T> {
         return inserted;
     }
 
-    private void insertRight(NodeDouble<T> node, NodeDouble<T> nodeNew) {
+    private boolean insertRight(NodeDouble<T> node, NodeDouble<T> nodeNew) {
         node.setRight(nodeNew);
         node.setFactorEquilibrium(node.getFactorEquilibrium() + 1);
         updateFactorEquilibrium(node);
         equilibrate(node.getRight());
+        return true;
     }
 
     private boolean insertLeft(NodeDouble<T> node, T value, NodeDouble<T> nodeNew) {
@@ -72,11 +76,12 @@ public class AVLTree<T> {
         return inserted;
     }
 
-    private void insertLeft(NodeDouble<T> node, NodeDouble<T> nodeNew) {
+    private boolean insertLeft(NodeDouble<T> node, NodeDouble<T> nodeNew) {
         node.setLeft(nodeNew);
         node.setFactorEquilibrium(node.getFactorEquilibrium() - 1);
         updateFactorEquilibrium(node);
         equilibrate(node.getLeft());
+        return true;
     }
 
     public void updateFactorEquilibrium(NodeDouble<T> node) {
@@ -247,19 +252,16 @@ public class AVLTree<T> {
     }
 
     private T findData(NodeDouble<T> current, T value) {
-        NodeDouble<T> nodeFound = new NodeDouble<T>(null);
-        T dataFound = nodeFound.getData();
-        if (current == null) {
-            dataFound = null;
-        }
-
-        if (comparator.compare(value, current.getData()) == 0) {
-            dataFound = current.getData();
-        } else {
-            if (comparator.compare(value, current.getData()) > 0) {
-                dataFound = findData(current.getRight(), value);
+        T dataFound = new NodeDouble<T>(null).getData();
+        if (current != null) {
+            if (comparator.compare(value, current.getData()) == 0) {
+                dataFound = current.getData();
             } else {
-                dataFound = findData(current.getLeft(), value);
+                if (comparator.compare(value, current.getData()) > 0) {
+                    dataFound = findData(current.getRight(), value);
+                } else {
+                    dataFound = findData(current.getLeft(), value);
+                }
             }
         }
         System.out.println();
