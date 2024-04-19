@@ -50,7 +50,6 @@ public class AVLTree<T> {
         boolean inserted = false;
         if (node.getRight() == null) {
             inserted = insertRight(node, nodeNew);
-            inserted = true;
         } else {
             insert(node.getRight(), value);
         }
@@ -71,7 +70,7 @@ public class AVLTree<T> {
             insertLeft(node, nodeNew);
             inserted = true;
         } else {
-            insert(node.getLeft(), value);
+           inserted = insert(node.getLeft(), value);
         }
         return inserted;
     }
@@ -118,28 +117,70 @@ public class AVLTree<T> {
     }
 
 
-    private NodeDouble<T> equilibrate(NodeDouble<T> nodeNew) {
+    private void equilibrate(NodeDouble<T> nodeNew) {
         NodeDouble<T> rootSubTree = searchRootSubTree(nodeNew);
-        NodeDouble<T> nodeFather = new NodeDouble<T>(null);
         if (rootSubTree != null) {
-            switch (rootSubTree.getFactorEquilibrium()) {
-                case 2:
-                    if (rootSubTree.getRight().getFactorEquilibrium() == 1) {
-                        searchFather(rootSubTree).setRight(rotationSimpleDD(rootSubTree, rootSubTree.getRight()));
-                    } else {
-                        searchFather(rootSubTree).setLeft(rotationDoubleID(rootSubTree, rootSubTree.getRight()));
-                    }
-                    break;
-                case -2:
-                    if (rootSubTree.getLeft().getFactorEquilibrium() == -1) {
-                        searchFather(rootSubTree).setLeft(rotationSimpleII(rootSubTree, rootSubTree.getLeft()));
-                    } else {
-                        searchFather(rootSubTree).setLeft(rotationDoubleDI(rootSubTree, rootSubTree.getLeft()));
-                    }
-                    break;
-            }
+            searchRotation(rootSubTree);
         }
-        return nodeFather;
+    }
+
+    public void searchRotation(NodeDouble<T> rootSubTree){
+        switch (rootSubTree.getFactorEquilibrium()) {
+            case 2:
+                rotationSubTreeRight(rootSubTree);
+                break;
+            case -2:
+                rotationSubTreLeft(rootSubTree);
+                break;
+        }
+    }
+
+    public void rotationSubTreeRight(NodeDouble<T> rootSubTree){
+        if (rootSubTree.getRight().getFactorEquilibrium() == 1) {
+            rotationSimpleDD(rootSubTree);
+        } else {
+            rotationDoubleID(rootSubTree);
+        }
+    }
+
+    public void rotationSubTreLeft(NodeDouble<T> rootSubTree){
+        if (rootSubTree.getLeft().getFactorEquilibrium() == -1) {
+            rotationSimpleII(rootSubTree);
+        } else {
+            rotationDoubleDI(rootSubTree);
+        }
+    }
+
+    public void rotationSimpleDD(NodeDouble<T> rootSubTree){
+        if (rootSubTree == this.root) {
+            this.root = rotationSimpleDD(rootSubTree, rootSubTree.getRight());
+        } else {
+            searchFather(rootSubTree).setRight(rotationSimpleDD(rootSubTree, rootSubTree.getRight()));
+        }
+    }
+
+    public void rotationDoubleID(NodeDouble<T> rootSubTree){
+        if (rootSubTree == this.root) {
+            this.root = rotationDoubleID(rootSubTree, rootSubTree.getRight());
+        } else {
+            searchFather(rootSubTree).setRight(rotationDoubleID(rootSubTree, rootSubTree.getRight()));
+        }
+    }
+
+    public void rotationSimpleII(NodeDouble<T> rootSubTree){
+        if(rootSubTree == this.root) {
+            this.root = rotationSimpleII(rootSubTree, rootSubTree.getLeft());
+        } else {
+            searchFather(rootSubTree).setLeft(rotationSimpleII(rootSubTree, rootSubTree.getLeft()));
+        }
+    }
+
+    public void rotationDoubleDI(NodeDouble<T> rootSubTree){
+        if (rootSubTree == this.root) {
+            this.root = rotationDoubleDI(rootSubTree, rootSubTree.getLeft());
+        } else {
+            searchFather(rootSubTree).setLeft(rotationDoubleDI(rootSubTree, rootSubTree.getLeft()));
+        }
     }
 
     private NodeDouble<T> searchRootSubTree(NodeDouble<T> nodeNew){
@@ -153,9 +194,10 @@ public class AVLTree<T> {
     private NodeDouble<T> rotationSimpleII(NodeDouble<T> nodeProblem, NodeDouble<T> nodeReference) {
         nodeProblem.setLeft(nodeReference.getRight());
         nodeReference.setRight(nodeProblem);
-        nodeProblem = nodeReference;
         nodeProblem.setFactorEquilibrium(nodeProblem.getFactorEquilibrium() + 2);
         nodeReference.setFactorEquilibrium(nodeReference.getFactorEquilibrium() + 1);
+        nodeProblem = nodeReference;
+
         return nodeProblem;
     }
 
@@ -163,9 +205,10 @@ public class AVLTree<T> {
     private NodeDouble<T> rotationSimpleDD(NodeDouble<T> nodeProblem, NodeDouble<T> nodeReference) {
         nodeProblem.setRight(nodeReference.getLeft());
         nodeReference.setLeft(nodeProblem);
-        nodeProblem = nodeReference;
         nodeProblem.setFactorEquilibrium(nodeProblem.getFactorEquilibrium() - 2);
         nodeReference.setFactorEquilibrium(nodeReference.getFactorEquilibrium() - 1);
+        nodeProblem = nodeReference;
+
         return nodeProblem;
     }
 
@@ -175,9 +218,10 @@ public class AVLTree<T> {
         nodeDescendant.setLeft(nodeProblem);
         nodeReference.setLeft(nodeDescendant.getRight());
         nodeDescendant.setRight(nodeReference);
-        nodeProblem = nodeDescendant;
         nodeProblem.setFactorEquilibrium(nodeProblem.getFactorEquilibrium() - 2);
         nodeReference.setFactorEquilibrium(nodeReference.getFactorEquilibrium() + 1);
+        nodeProblem = nodeDescendant;
+
         return nodeProblem;
     }
 
@@ -187,62 +231,63 @@ public class AVLTree<T> {
         nodeDescendant.setRight(nodeProblem);
         nodeReference.setRight(nodeDescendant.getLeft());
         nodeDescendant.setLeft(nodeReference);
-        nodeProblem = nodeDescendant;
         nodeProblem.setFactorEquilibrium(nodeProblem.getFactorEquilibrium() + 2);
         nodeReference.setFactorEquilibrium(nodeReference.getFactorEquilibrium() - 1);
+        nodeProblem = nodeDescendant;
         return nodeProblem;
     }
 
-    public void remove(T value) throws Exception {
-        this.root = remove(this.root, value);
+
+    public boolean remove(T value) throws Exception {
+        return remove(this.root, value);
     }
 
-    private NodeDouble<T> remove(NodeDouble<T> current, T value) {
-
-        NodeDouble<T> nodeRemove = new NodeDouble<T>(null);
-        if (current == null) {
-            throw new RuntimeException("Element not found");
+    private boolean remove(NodeDouble<T> current, T value) {
+        boolean removed = false;
+        if (current != null) {
+           removed = searchRemove(current, value);
         }
-        if (comparator.compare(value, current.getData()) > 0) {
-            current.setRight(remove(current.getRight(), value));
-        } else if (comparator.compare(value, current.getData()) < 0) {
-            current.setLeft(remove(current.getLeft(), value));
-        } else {
-            if (current.getLeft() == null) {
-                nodeRemove = current.getRight();
+        return removed;
+    }
 
-                updateFactorEquilibrium(this.root);
-                equilibrate(nodeRemove);
-            } else if (current.getRight() == null) {
-                nodeRemove = current.getLeft();
-                updateFactorEquilibrium(this.root);
-                equilibrate(nodeRemove);
+    private boolean searchRemove(NodeDouble<T> current, T value){
+        boolean removed = false;
+        if (comparator.compare(value, current.getData()) == 0) {
+            current = remove(current);
+            removed = true;
+        } else {
+            if (comparator.compare(value, current.getData()) > 0) {
+                remove(current.getRight(), value);
             } else {
-                NodeDouble<T> aux = remplace(current);
-                if (current.equals(root)) {
-                    root = aux;
-                    updateFactorEquilibrium(this.root);
-                    equilibrate(root);
-                }
+                remove(current.getLeft(), value);
             }
         }
-        nodeRemove = current;
-        return nodeRemove;
+        return removed;
+    }
+
+    private NodeDouble<T> remove(NodeDouble<T> current){
+       current= remplace(current);
+        updateFactorEquilibrium(this.root);
+        equilibrate(current);
+        return current;
     }
 
 
     private NodeDouble<T> remplace(NodeDouble<T> current) {
-        NodeDouble<T> father = current;
         NodeDouble<T> aux = current.getLeft();
         while (aux.getRight() != null) {
-            father = aux;
             aux = aux.getRight();
+            current.setData(aux.getData());
         }
-        current.setData(aux.getData());
-        if (father.equals(current)) {
-            father.setLeft(aux.getLeft());
+        aux= remplace(aux, current);
+        return aux;
+    }
+
+    public NodeDouble<T> remplace(NodeDouble<T> aux, NodeDouble<T> current) {
+        if (aux.equals(current)) {
+            aux.setLeft(aux.getLeft());
         } else {
-            father.setRight(aux.getLeft());
+            aux.setRight(aux.getLeft());
         }
         return aux;
     }
@@ -264,7 +309,7 @@ public class AVLTree<T> {
                 }
             }
         }
-        System.out.println();
+
         return dataFound;
     }
 

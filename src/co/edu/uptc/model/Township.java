@@ -11,7 +11,7 @@ public class Township {
 
     public Township(String name) {
         this.name = name;
-        this.inhabitants = new AVLTree<>(Comparator.comparing(Inhabitant::getId));
+        this.inhabitants = new AVLTree<>(Comparator.comparing(Inhabitant::getName));
     }
 
     public boolean addInhabitant(Inhabitant inhabitant) {
@@ -27,7 +27,7 @@ public class Township {
     }
 
     public List <Inhabitant> getInhabitants() {
-        return this.inhabitants.preOrder();
+        return this.inhabitants.inOrder();
     }
 
     public int calculateNumberInhabitants() {

@@ -16,7 +16,7 @@ public class Department {
     public boolean addInhabitantInTown(String townshipName, Inhabitant inhabitant) {
         boolean added = false;
         if(searchTownship(townshipName) == null){
-            Township township = new Township(townshipName);
+            Township township = new Township(townshipName.toUpperCase().replace(" ", ""));
             this.townships.insert(township);
             added = township.addInhabitant(inhabitant);
         }else {
@@ -30,7 +30,7 @@ public class Department {
     }
 
     public Township searchTownship(String townshipName) {
-        return this.townships.searchData(new Township(townshipName));
+        return this.townships.searchData(new Township(townshipName.toUpperCase().replace(" ", "")));
     }
 
     public String getName() {

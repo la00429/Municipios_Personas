@@ -16,11 +16,4 @@ public class Inhabitant {
     public String getName() {
         return name;
     }
-
-    public String toString() {
-        return "Inhabitant{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

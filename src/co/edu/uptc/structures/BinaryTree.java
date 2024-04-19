@@ -91,46 +91,40 @@ public class BinaryTree<T> {
     }
 
     public void remove(T value) throws Exception{
-        this.root = remove(this.root, value);
+        remove(this.root, value);
     }
 
-    public NodeDouble<T> remove(NodeDouble<T> current, T value)  {
-
+    public void remove(NodeDouble<T> current, T value)  {
         if (current == null) {
             throw new RuntimeException("Element not found");
         }
-
-        if (comparator.compare(value, current.getData()) > 0) {
-            current.setRight(remove(current.getRight(), value));
-        } else if (comparator.compare(value, current.getData()) < 0) {
-            current.setLeft(remove(current.getLeft(), value));
+        if (comparator.compare(value, current.getData()) == 0) {
+            current = remplace(current);
         } else {
-            if (current.getLeft() == null) {
-                return current.getRight();
-            } else if (current.getRight() == null) {
-                return current.getLeft();
+            if (comparator.compare(value, current.getData()) > 0) {
+                remove(current.getRight(), value);
             } else {
-                NodeDouble<T> aux = remplace(current);
-                if (current.equals(root)) {
-                    root = aux;
-                }
+                remove(current.getLeft(), value);
             }
         }
-        return current;
+
     }
 
     private NodeDouble<T> remplace(NodeDouble<T> current) {
-        NodeDouble<T> father = current;
         NodeDouble<T> aux = current.getLeft();
         while (aux.getRight() != null) {
-            father = aux;
             aux = aux.getRight();
+            current.setData(aux.getData());
         }
-        current.setData(aux.getData());
-        if (father.equals(current)) {
-            father.setLeft(aux.getLeft());
+        aux= remplace(aux, current);
+        return aux;
+    }
+
+    public NodeDouble<T> remplace(NodeDouble<T> aux, NodeDouble<T> current) {
+        if (aux.equals(current)) {
+            aux.setLeft(aux.getLeft());
         } else {
-            father.setRight(aux.getLeft());
+            aux.setRight(aux.getLeft());
         }
         return aux;
     }
